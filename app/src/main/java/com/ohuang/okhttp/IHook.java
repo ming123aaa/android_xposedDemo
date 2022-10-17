@@ -2,6 +2,7 @@ package com.ohuang.okhttp;
 
 import android.content.Context;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -13,22 +14,20 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public abstract class IHook extends XC_MethodHook {
 
-    protected static final Object OBJECT = new Object();
-    private static final HashMap<String, Method> methodCache;
+    public IHook() {
+
+    }
+
+    public IHook(ClassLoader classLoader) {
+        mClassLoader = classLoader;
+    }
 
     public abstract String getClassName();
 
 
-    private ClassLoader mClassLoader;
     private Class<?> mClass;
+    public ClassLoader mClassLoader = ClassLoader.getSystemClassLoader();
 
-    protected static Context mContext;
-
-
-    static {
-
-        methodCache = new HashMap<String, Method>();
-    }
 
     /**
      * 缓存 class 加速
@@ -46,7 +45,7 @@ public abstract class IHook extends XC_MethodHook {
 
             if (mClass == null) {
                 try {
-                    mClass = Class.forName(getClassName());
+                    mClass = Class.forName(getClassName(),false,mClassLoader);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -99,8 +98,6 @@ public abstract class IHook extends XC_MethodHook {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
         }
     }
@@ -113,6 +110,38 @@ public abstract class IHook extends XC_MethodHook {
         objects[parameterTypes.length] = this;
         try {
             XposedHelpers.findAndHookMethod(toClass(), name, objects);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hookAllConstructor() {
+        Constructor[] methods = toClass().getConstructors();
+        for (int i = 0; i < methods.length; i++) {
+            Constructor method = methods[i];
+
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            Object[] objects = new Object[parameterTypes.length + 1];
+            for (int i1 = 0; i1 < parameterTypes.length; i1++) {
+                objects[i1] = parameterTypes[i1];
+            }
+            objects[parameterTypes.length] = this;
+            try {
+                XposedHelpers.findAndHookConstructor(toClass(), objects);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void hookConstructor(Class<?>... parameterTypes) {
+        Object[] objects = new Object[parameterTypes.length + 1];
+        for (int i1 = 0; i1 < parameterTypes.length; i1++) {
+            objects[i1] = parameterTypes[i1];
+        }
+        objects[parameterTypes.length] = this;
+        try {
+            XposedHelpers.findAndHookConstructor(toClass(), objects);
         } catch (Exception e) {
             e.printStackTrace();
         }

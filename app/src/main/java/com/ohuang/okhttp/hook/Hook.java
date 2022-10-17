@@ -14,6 +14,11 @@ public abstract class Hook extends IHook {
         this.className = className;
     }
 
+    public Hook(String className,ClassLoader classLoader){
+        super(classLoader);
+        this.className = className;
+    }
+
     @Override
     public String getClassName() {
         return className;

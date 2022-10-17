@@ -11,6 +11,8 @@ import java.lang.reflect.Member;
 public class ContextWrapperHook extends IHook {
     public static final String TAG = "ContextWrapperHook";
 
+
+
     @Override
     public String getClassName() {
         return "android.content.ContextWrapper";
