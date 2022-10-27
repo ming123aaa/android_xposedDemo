@@ -5,6 +5,7 @@ import android.util.Log;
 import com.ohuang.okhttp.IHook;
 
 import java.lang.reflect.Member;
+import java.util.Arrays;
 
 public abstract class Hook extends IHook {
 
@@ -28,7 +29,7 @@ public abstract class Hook extends IHook {
     protected boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
-        Log.e(className + "Hook", "beforeMethod: thisObject=" + thisObject + "  method=" + method);
+        Log.e(className + "Hook", "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
         return false;
     }
 

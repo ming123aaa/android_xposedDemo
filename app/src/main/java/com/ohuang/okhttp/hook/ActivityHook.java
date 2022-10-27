@@ -5,6 +5,7 @@ import android.util.Log;
 import com.ohuang.okhttp.IHook;
 
 import java.lang.reflect.Member;
+import java.util.Arrays;
 
 public class ActivityHook extends IHook {
     public static final String TAG = "ActivityHook";
@@ -23,7 +24,7 @@ public class ActivityHook extends IHook {
     protected boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
-        Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method);
+        Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
         return false;
     }
 

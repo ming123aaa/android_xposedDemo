@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -45,7 +46,7 @@ public abstract class IHook extends XC_MethodHook {
 
             if (mClass == null) {
                 try {
-                    mClass = Class.forName(getClassName(),false,mClassLoader);
+                    mClass = Class.forName(getClassName(), false, mClassLoader);
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -60,6 +61,28 @@ public abstract class IHook extends XC_MethodHook {
 
     protected abstract boolean afterMethod(MethodHookParam param);
 
+    public void hookAllMethodForSuper() {
+        Class<?> aClass = toClass();
+        while (aClass != null) {
+            Method[] methods = aClass.getDeclaredMethods();
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
+
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                Object[] objects = new Object[parameterTypes.length + 1];
+                for (int i1 = 0; i1 < parameterTypes.length; i1++) {
+                    objects[i1] = parameterTypes[i1];
+                }
+                objects[parameterTypes.length] = this;
+                try {
+                    XposedHelpers.findAndHookMethod(aClass, method.getName(), objects);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            aClass = aClass.getSuperclass();
+        }
+    }
 
     public void hookAllMethod() {
         Method[] methods = toClass().getDeclaredMethods();
@@ -82,6 +105,40 @@ public abstract class IHook extends XC_MethodHook {
         }
     }
 
+    public void hookAllMethodForBridge(String name){
+        XposedBridge.hookAllMethods(toClass(),name,this);
+    }
+
+    public void hookAllConstructorsForBridge(){
+        XposedBridge.hookAllConstructors(toClass(),this);
+    }
+
+    public void hookAllMethodForSuper(String name) {
+        Class<?> aClass = toClass();
+        while (aClass != null) {
+            Method[] methods = aClass.getDeclaredMethods();
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
+                if (name.equals(method.getName())) {
+                    Class<?>[] parameterTypes = method.getParameterTypes();
+                    Object[] objects = new Object[parameterTypes.length + 1];
+                    for (int i1 = 0; i1 < parameterTypes.length; i1++) {
+                        objects[i1] = parameterTypes[i1];
+                    }
+                    objects[parameterTypes.length] = this;
+                    try {
+                        XposedHelpers.findAndHookMethod(aClass, name, objects);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+            aClass = aClass.getSuperclass();
+        }
+    }
+
     public void hookAllMethod(String name) {
         Method[] methods = toClass().getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
@@ -101,6 +158,40 @@ public abstract class IHook extends XC_MethodHook {
             }
         }
     }
+
+
+    public void hookMethodForSuper(String name, Class<?>... parameterTypes) {
+        Class<?> aClass = toClass();
+        while (aClass != null) {
+            Method[] methods = aClass.getDeclaredMethods();
+            a:
+            for (int i = 0; i < methods.length; i++) {
+                Method method = methods[i];
+                if (name.equals(method.getName())) {
+                    Class<?>[] methodParameterTypes = method.getParameterTypes();
+                    if (methodParameterTypes.length != parameterTypes.length) {
+                        continue;
+                    }
+                    Object[] objects = new Object[parameterTypes.length + 1];
+                    for (int i1 = 0; i1 < parameterTypes.length; i1++) {
+                        if (methodParameterTypes[i1] == parameterTypes[i1]) {
+                            objects[i1] = parameterTypes[i1];
+                        } else {
+                            continue a;
+                        }
+                    }
+                    objects[parameterTypes.length] = this;
+                    try {
+                        XposedHelpers.findAndHookMethod(aClass, name, objects);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            aClass = aClass.getSuperclass();
+        }
+    }
+
 
     public void hookMethod(String name, Class<?>... parameterTypes) {
         Object[] objects = new Object[parameterTypes.length + 1];
