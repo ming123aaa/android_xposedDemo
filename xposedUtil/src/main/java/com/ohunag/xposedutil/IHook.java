@@ -1,4 +1,4 @@
-package com.ohuang.okhttp;
+package com.ohunag.xposedutil;
 
 import android.content.Context;
 
@@ -59,7 +59,10 @@ public abstract class IHook extends XC_MethodHook {
 
     protected abstract boolean beforeMethod(MethodHookParam param);
 
+    protected  void beforeMethodEnd(MethodHookParam param){}
+
     protected abstract boolean afterMethod(MethodHookParam param);
+    protected  void afterMethodEnd(MethodHookParam param){}
 
     public void hookAllMethodForSuper() {
         Class<?> aClass = toClass();
@@ -243,6 +246,7 @@ public abstract class IHook extends XC_MethodHook {
         if (!beforeMethod(param)) {
             super.beforeHookedMethod(param);
         }
+        beforeMethodEnd(param);
     }
 
     @Override
@@ -250,5 +254,6 @@ public abstract class IHook extends XC_MethodHook {
         if (!afterMethod(param)) {
             super.afterHookedMethod(param);
         }
+        afterMethodEnd(param);
     }
 }

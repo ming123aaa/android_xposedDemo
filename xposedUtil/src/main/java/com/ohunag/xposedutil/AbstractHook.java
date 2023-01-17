@@ -1,13 +1,13 @@
-package com.ohuang.okhttp.hook;
+package com.ohunag.xposedutil;
 
 import android.util.Log;
 
-import com.ohuang.okhttp.IHook;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * hook  abstract method
+ */
 public abstract class AbstractHook extends Hook{
 
     Map<Class,Boolean> map=new HashMap<>();

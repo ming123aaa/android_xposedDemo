@@ -3,7 +3,7 @@ package com.ohuang.okhttp.hook;
 import android.content.ContentResolver;
 import android.util.Log;
 
-import com.ohuang.okhttp.IHook;
+import com.ohunag.xposedutil.IHook;
 
 import java.lang.reflect.Member;
 

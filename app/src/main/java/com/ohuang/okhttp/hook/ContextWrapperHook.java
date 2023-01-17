@@ -1,10 +1,8 @@
 package com.ohuang.okhttp.hook;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
-import com.ohuang.okhttp.IHook;
+import com.ohunag.xposedutil.IHook;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -21,18 +19,19 @@ public class ContextWrapperHook extends IHook {
 
     @Override
     public void hook() {
-        hookAllMethod("startActivity");
-        hookAllMethod("sendBroadcast");
-        hookAllMethod("startService");
-        hookAllMethod("startForegroundService");
-        hookAllMethod("sendBroadcastAsUser");
-        hookAllMethod("sendOrderedBroadcastAsUser");
-        hookAllMethod("sendOrderedBroadcast");
-        hookAllMethod("sendStickyBroadcast");
-        hookAllMethod("sendStickyBroadcastAsUser");
-        hookAllMethod("sendBroadcastWithMultiplePermissions");
-        hookAllMethod("sendStickyOrderedBroadcastAsUser");
-        hookAllMethod("sendStickyOrderedBroadcast");
+//        hookAllMethod("startActivity");
+//        hookAllMethod("sendBroadcast");
+//        hookAllMethod("startService");
+//        hookAllMethod("startForegroundService");
+//        hookAllMethod("sendBroadcastAsUser");
+//        hookAllMethod("sendOrderedBroadcastAsUser");
+//        hookAllMethod("sendOrderedBroadcast");
+//        hookAllMethod("sendStickyBroadcast");
+//        hookAllMethod("sendStickyBroadcastAsUser");
+//        hookAllMethod("sendBroadcastWithMultiplePermissions");
+//        hookAllMethod("sendStickyOrderedBroadcastAsUser");
+//        hookAllMethod("sendStickyOrderedBroadcast");
+        hookAllMethod("getResources");
     }
 
     @Override

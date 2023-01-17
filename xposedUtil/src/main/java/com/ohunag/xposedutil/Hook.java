@@ -1,8 +1,8 @@
-package com.ohuang.okhttp.hook;
+package com.ohunag.xposedutil;
 
 import android.util.Log;
 
-import com.ohuang.okhttp.IHook;
+import com.ohunag.xposedutil.IHook;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -29,8 +29,14 @@ public abstract class Hook extends IHook {
     protected boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
-        Log.e(className + "Hook", "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
+        log( "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
+
         return false;
+    }
+
+    public void log(String s){
+        Log.e(className + "Hook", s);
+
     }
 
     @Override

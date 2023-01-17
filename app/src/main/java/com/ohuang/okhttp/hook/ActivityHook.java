@@ -2,13 +2,13 @@ package com.ohuang.okhttp.hook;
 
 import android.util.Log;
 
-import com.ohuang.okhttp.IHook;
+import com.ohunag.xposedutil.IHook;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
 
 public class ActivityHook extends IHook {
-    public static final String TAG = "ActivityHook";
+        public static final String TAG = "ActivityHook";
 
     @Override
     public String getClassName() {
