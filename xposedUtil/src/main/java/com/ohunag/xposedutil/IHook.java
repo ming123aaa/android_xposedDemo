@@ -13,10 +13,11 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public abstract class IHook extends XC_MethodHook {
+public abstract class IHook extends XC_MethodHook implements HookCallBack {
 
-    public IHook() {
 
+    public IHook(Class<?> mClass) {
+        this.mClass = mClass;
     }
 
     public IHook(ClassLoader classLoader) {
@@ -43,7 +44,13 @@ public abstract class IHook extends XC_MethodHook {
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-
+            if (mClass == null) {
+                try {
+                    mClass = mClassLoader.loadClass(getClassName());
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
             if (mClass == null) {
                 try {
                     mClass = Class.forName(getClassName(), false, mClassLoader);
@@ -57,12 +64,12 @@ public abstract class IHook extends XC_MethodHook {
 
     public abstract void hook();
 
-    protected abstract boolean beforeMethod(MethodHookParam param);
+    public abstract boolean beforeMethod(MethodHookParam param);
 
-    protected  void beforeMethodEnd(MethodHookParam param){}
+    public  void beforeMethodEnd(MethodHookParam param){}
 
-    protected abstract boolean afterMethod(MethodHookParam param);
-    protected  void afterMethodEnd(MethodHookParam param){}
+    public abstract boolean afterMethod(MethodHookParam param);
+    public   void afterMethodEnd(MethodHookParam param){}
 
     public void hookAllMethodForSuper() {
         Class<?> aClass = toClass();
@@ -89,6 +96,7 @@ public abstract class IHook extends XC_MethodHook {
 
     public void hookAllMethod() {
         Method[] methods = toClass().getDeclaredMethods();
+
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
 
@@ -162,14 +170,18 @@ public abstract class IHook extends XC_MethodHook {
         }
     }
 
-
+    /**
+     * hook方法包括父类的
+     * @param name
+     * @param parameterTypes
+     */
+    @Deprecated
     public void hookMethodForSuper(String name, Class<?>... parameterTypes) {
         Class<?> aClass = toClass();
         while (aClass != null) {
             Method[] methods = aClass.getDeclaredMethods();
             a:
-            for (int i = 0; i < methods.length; i++) {
-                Method method = methods[i];
+            for (Method method : methods) {
                 if (name.equals(method.getName())) {
                     Class<?>[] methodParameterTypes = method.getParameterTypes();
                     if (methodParameterTypes.length != parameterTypes.length) {

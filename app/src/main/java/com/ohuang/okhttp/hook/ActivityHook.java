@@ -10,6 +10,10 @@ import java.util.Arrays;
 public class ActivityHook extends IHook {
         public static final String TAG = "ActivityHook";
 
+    public ActivityHook(ClassLoader classLoader) {
+        super(classLoader);
+    }
+
     @Override
     public String getClassName() {
         return "android.app.Activity";
@@ -18,10 +22,14 @@ public class ActivityHook extends IHook {
     @Override
     public void hook() {
         hookAllMethod("startActivityForResult");
+        hookAllMethod("startService");
+        hookAllMethod("startForegroundService");
+        hookAllMethod("onActivityResult");
+
     }
 
     @Override
-    protected boolean beforeMethod(MethodHookParam param) {
+    public boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
         Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
@@ -29,7 +37,7 @@ public class ActivityHook extends IHook {
     }
 
     @Override
-    protected boolean afterMethod(MethodHookParam param) {
+    public boolean afterMethod(MethodHookParam param) {
         return false;
     }
 }

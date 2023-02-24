@@ -10,6 +10,10 @@ import java.lang.reflect.Member;
 public class ContentResolverHook extends IHook {
     public static final String TAG = "ContentResolverHook";
 
+    public ContentResolverHook(ClassLoader classLoader) {
+        super(classLoader);
+    }
+
     @Override
     public String getClassName() {
         return ContentResolver.class.getName();
@@ -25,7 +29,7 @@ public class ContentResolverHook extends IHook {
     }
 
     @Override
-    protected boolean beforeMethod(MethodHookParam param) {
+    public boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
         Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method);
@@ -33,7 +37,7 @@ public class ContentResolverHook extends IHook {
     }
 
     @Override
-    protected boolean afterMethod(MethodHookParam param) {
+    public boolean afterMethod(MethodHookParam param) {
         return false;
     }
 }

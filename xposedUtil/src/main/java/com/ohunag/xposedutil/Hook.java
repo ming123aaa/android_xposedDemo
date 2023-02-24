@@ -10,14 +10,16 @@ import java.util.Arrays;
 public abstract class Hook extends IHook {
 
     public String className;
+    public String TAG="hook";
 
-    public Hook(String className) {
-        this.className = className;
+    public Hook(Class<?> mClass) {
+        super(mClass);
     }
 
     public Hook(String className,ClassLoader classLoader){
         super(classLoader);
         this.className = className;
+        TAG=className + "Hook";
     }
 
     @Override
@@ -26,21 +28,21 @@ public abstract class Hook extends IHook {
     }
 
     @Override
-    protected boolean beforeMethod(MethodHookParam param) {
-        Member method = param.method;
-        Object thisObject = param.thisObject;
-        log( "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
+    public boolean beforeMethod(MethodHookParam param) {
+//        Member method = param.method;
+//        Object thisObject = param.thisObject;
+//        log( "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
 
         return false;
     }
 
     public void log(String s){
-        Log.e(className + "Hook", s);
+        Log.e(TAG, s);
 
     }
 
     @Override
-    protected boolean afterMethod(MethodHookParam param) {
+    public boolean afterMethod(MethodHookParam param) {
         return false;
     }
 }

@@ -1,18 +1,28 @@
 package com.ohuang.okhttp;
 
-import android.graphics.Canvas;
+import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
+import android.webkit.WebView;
 
 import com.ohuang.okhttp.hook.ActivityHook;
+import com.ohuang.okhttp.hook.ContextWrapperHook;
+import com.ohuang.okhttp.hook.CookieManagerHook;
+import com.ohuang.okhttp.hook.TouchEventViewHook;
+import com.ohuang.okhttp.hook.WebViewHook;
 import com.ohunag.xposedutil.Hook;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
@@ -20,110 +30,78 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
  * @author a
  */
 public class Tutorial implements IXposedHookLoadPackage, IXposedHookZygoteInit, IXposedHookInitPackageResources {
-    public static final String TAG = "Tutorial";
+    public static final String TAG = "TutorialHook";
     public static String packageName = "null";
     public static String processName = "null";
+    public static boolean isInit = false;
 
     @Override
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable {
         packageName = lpparam.packageName;
         processName = lpparam.processName;
         Log.e(TAG, "handleLoadPackage: pkg=" + packageName + " processName=" + packageName);
-        if (packageName.equals("com.miui.contentcatcher") || packageName.equals("com.miui.catcherpatch") || packageName.equals("com.google.android.webview")) {
-            return;
-        }
+
 //        if (
 //                !packageName.equals("com.jiguangssp.addemo")) {
 //            return;
 //        }
+        if (isInit) {
+            return;
+        }
+        isInit = true;
         Log.e(TAG, "handleLoadPackage: hook pkg=" + packageName + " processName=" + packageName);
 
-        new ActivityHook().hook();
-        new Hook(Canvas.class.getName(), lpparam.classLoader) {
+        new ActivityHook(lpparam.classLoader).hook();
+        new ContextWrapperHook(lpparam.classLoader).hook();
+
+        new WebViewHook(lpparam.classLoader).hook();
+
+//        new TouchEventViewHook(lpparam.classLoader).hook();
+//        new TouchEventViewGroupHook(lpparam.classLoader).hook();
+        new CookieManagerHook(lpparam.classLoader).hook();
+
+        new Hook(Application.class.getName(), lpparam.classLoader) {
 
             @Override
-            protected boolean beforeMethod(MethodHookParam param) {
-//                if (param.method.getName().equals("setMatrix")){
-//                    logStackTraceElement("setMatrixHook");
-//                }
-                return super.beforeMethod(param);
-            }
+            public boolean afterMethod(MethodHookParam param) {
+                try {
+                    Class<?> aClass = lpparam.classLoader.loadClass(WebView.class.getName());
+                    Method setWebContentsDebuggingEnabled = aClass.getMethod("setWebContentsDebuggingEnabled", boolean.class);
+                    setWebContentsDebuggingEnabled.invoke(null, true);
+                } catch (ClassNotFoundException | NoSuchMethodException |
+                         InvocationTargetException | IllegalAccessException e) {
 
-            @Override
-            public void hook() {
-                hookAllMethod();
-//                hookAllMethod("rotate");
-//                hookAllMethod("setMatrix");
-//                hookAllMethod("concat");
-//                hookAllMethod("translate");
-            }
-        }.hook();
-
-//        new Hook("com.douban.frodo.subject.archive.stack.VelocityViewPager",lpparam.classLoader){
-//
-//            @Override
-//            protected boolean beforeMethod(MethodHookParam param) {
-//                if (param.method.getName().equals("c")){
-//
-//                    logStackTraceElement("c_tag");
-//                }
-//                return super.beforeMethod(param);
-//            }
-//
-//            @Override
-//            protected boolean afterMethod(MethodHookParam param) {
-//                if (param.method.getName().equals("c")) {
-//                    Object result = param.getResult();
-//                    Log.d("c_tag", "afterMethod: result="+ObjectToString.toString(result));
-//                }
-//                return super.afterMethod(param);
-//            }
-//
-//            @Override
-//            public void hook() {
-//               hookMethod("c",int.class);
-//            }
-//        }.hook();
-
-        new Hook("com.douban.frodo.subject.archive.stack.StackBundleView", lpparam.classLoader) {
-
-            @Override
-            protected boolean beforeMethod(MethodHookParam param) {
-                log(ObjectToString.toString(param.thisObject));
-                return super.beforeMethod(param);
-            }
-
-            @Override
-            protected boolean afterMethod(MethodHookParam param) {
-
+                }
                 return super.afterMethod(param);
             }
 
             @Override
             public void hook() {
-                hookAllMethod("setDistanceFromCenter");
+                hookAllMethod("onCreate");
             }
         }.hook();
 
-//
-//        new Hook(SensorManager.class.getName(),lpparam.classLoader){
-//
-//
-//            @Override
-//            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                super.beforeHookedMethod(param);
-//
-//                Log.d("registerListener", "beforeHookedMethod: " + param.args[0]);
-//                logStackTraceElement("registerListener");
-//            }
-//
-//            @Override
-//            public void hook() {
-//                hookAllMethod("registerListener");
-//            }
-//        }.hook();
 
 
+    }
+
+    public String objectToString(Object o) {
+        if (o == null) {
+            return "";
+        }
+        Class<?> aClass = o.getClass();
+        Field[] declaredFields = aClass.getDeclaredFields();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(aClass.getName()).append(":[");
+        for (Field declaredField : declaredFields) {
+            declaredField.setAccessible(true);
+            try {
+                stringBuilder.append(declaredField.getName()).append(":").append(declaredField.get(o)).append(",");
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return stringBuilder.append("]").toString();
     }
 
 

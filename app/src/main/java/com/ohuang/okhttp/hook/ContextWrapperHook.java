@@ -10,6 +10,9 @@ import java.util.Arrays;
 public class ContextWrapperHook extends IHook {
     public static final String TAG = "ContextWrapperHook";
 
+    public ContextWrapperHook(ClassLoader classLoader) {
+        super(classLoader);
+    }
 
 
     @Override
@@ -19,10 +22,11 @@ public class ContextWrapperHook extends IHook {
 
     @Override
     public void hook() {
-//        hookAllMethod("startActivity");
+        hookAllMethod("startActivity");
+//        hookAllMethod("getPackageManager");
 //        hookAllMethod("sendBroadcast");
-//        hookAllMethod("startService");
-//        hookAllMethod("startForegroundService");
+        hookAllMethod("startService");
+        hookAllMethod("startForegroundService");
 //        hookAllMethod("sendBroadcastAsUser");
 //        hookAllMethod("sendOrderedBroadcastAsUser");
 //        hookAllMethod("sendOrderedBroadcast");
@@ -31,11 +35,11 @@ public class ContextWrapperHook extends IHook {
 //        hookAllMethod("sendBroadcastWithMultiplePermissions");
 //        hookAllMethod("sendStickyOrderedBroadcastAsUser");
 //        hookAllMethod("sendStickyOrderedBroadcast");
-        hookAllMethod("getResources");
+//        hookAllMethod("getResources");
     }
 
     @Override
-    protected boolean beforeMethod(MethodHookParam param) {
+    public boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
         Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
@@ -59,7 +63,7 @@ public class ContextWrapperHook extends IHook {
     }
 
     @Override
-    protected boolean afterMethod(MethodHookParam param) {
+    public boolean afterMethod(MethodHookParam param) {
         return false;
     }
 }
