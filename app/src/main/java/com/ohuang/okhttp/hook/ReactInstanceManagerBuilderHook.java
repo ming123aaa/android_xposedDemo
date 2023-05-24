@@ -8,32 +8,35 @@ import com.ohunag.xposedutil.IHook;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 
-public class ActivityHook extends IHook {
-        public static final String TAG = "ActivityHook";
+public class ReactInstanceManagerBuilderHook extends IHook {
+    public static final String TAG = "ReactInstanceManagerBuilderHook";
 
-    public ActivityHook(ClassLoader classLoader) {
+    public ReactInstanceManagerBuilderHook(ClassLoader classLoader) {
         super(classLoader);
     }
 
     @Override
     public String getClassName() {
-        return "android.app.Activity";
+        return "com.facebook.react.ReactInstanceManagerBuilder";
     }
 
     @Override
     public void hook() {
-        hookAllMethod("startActivityForResult");
-        hookAllMethod("startService");
-        hookAllMethod("startForegroundService");
-        hookAllMethod("onActivityResult");
+        hookAllMethod("setBundleAssetName");
+        hookAllMethod("setJSMainModulePath");
+        hookAllMethod("setJSBundleFile");
+    }
 
+    public void log(String s) {
+        Log.e(TAG, s);
+//        LogFile.logDate(s);
     }
 
     @Override
     public boolean beforeMethod(MethodHookParam param) {
         Member method = param.method;
         Object thisObject = param.thisObject;
-        Log.e(TAG, "beforeMethod: thisObject=" + thisObject + "  method=" + method+" param="+ Arrays.toString(param.args));
+        log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" + Arrays.toString(param.args));
 
         return false;
     }

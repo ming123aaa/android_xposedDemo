@@ -3,6 +3,7 @@ package com.ohuang.okhttp.hook;
 import android.util.Log;
 import android.webkit.CookieManager;
 
+import com.ohuang.okhttp.Util;
 import com.ohunag.xposedutil.AbstractHook;
 import com.ohunag.xposedutil.Hook;
 import com.ohunag.xposedutil.IHook;
@@ -35,7 +36,9 @@ public class CookieManagerHook extends AbstractHook {
                 Object thisObject = param.thisObject;
                 Object result=param.getResult();
                 log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" + Arrays.toString(param.args)+"  result="+result);
-
+                if ("getCookie".equals(method.getName())&&"https://accounts.nintendo.com/login".equals(param.args[0])){
+                    Util.logStackTraceElement(TAG);
+                }
                 return super.afterMethod(param);
             }
         };

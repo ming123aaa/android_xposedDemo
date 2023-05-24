@@ -14,6 +14,7 @@ public abstract class Hook extends IHook {
 
     public Hook(Class<?> mClass) {
         super(mClass);
+        TAG=mClass.getName() + "Hook";
     }
 
     public Hook(String className,ClassLoader classLoader){

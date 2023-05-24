@@ -47,5 +47,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
     compileOnly 'de.robv.android.xposed:api:82'
     implementation project(":xposedUtil")
+    implementation 'com.orhanobut:logger:2.2.0'
 
 }
