@@ -22,7 +22,7 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Easy example which makes the status bar clock red and adds a smiley" />
+            android:value="ming123aaa  xposed demo" />
         <meta-data
             android:name="xposedminversion"
             android:value="53" />

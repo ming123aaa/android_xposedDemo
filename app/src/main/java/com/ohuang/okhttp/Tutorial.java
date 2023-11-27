@@ -1,18 +1,14 @@
 package com.ohuang.okhttp;
 
-import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 
-import com.ohunag.xposedutil.Hook;
-import com.orhanobut.logger.AndroidLogAdapter;
-import com.orhanobut.logger.Logger;
+import com.ohuang.okhttp.hook.ActivityHook;
+import com.ohuang.okhttp.hook.ContextWrapperHook;
+import com.ohuang.okhttp.util.PackageUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -45,8 +41,8 @@ public class Tutorial implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
         isInit = true;
         Log.e(TAG, "handleLoadPackage: hook pkg=" + packageName + " processName=" + packageName);
 
-//        new ActivityHook(lpparam.classLoader).hook();
-//        new ContextWrapperHook(lpparam.classLoader).hook();
+        new ActivityHook(lpparam.classLoader).hook();
+        new ContextWrapperHook(lpparam.classLoader).hook();
 
 //        new WebViewHook(lpparam.classLoader).hook();
 
@@ -58,102 +54,20 @@ public class Tutorial implements IXposedHookLoadPackage, IXposedHookZygoteInit, 
 //      new SettingsSecureHook(lpparam.classLoader).hook();
 //      new SettingsSystemHook(lpparam.classLoader).hook();
 
+//       new  DeviceInfoHook().hook(lpparam.classLoader);
 
-        XposedHelpers.findAndHookMethod(View.class, "setOnClickListener", View.OnClickListener.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Application.class,"onCreate",new XC_MethodHook(){
 
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object obargs = param.args[0];
-                Object pClass = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{View.OnClickListener.class}, new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-                        Logger.d(TAG + ":  obj=" + obargs + " objectToString=" + objectToString(obargs, 5));
-                        Logger.json(objectToString(obargs, 3));
-
-                        return method.invoke(obargs, args);
-                    }
-                });
-                param.args[0] = pClass;
                 super.beforeHookedMethod(param);
-            }
-
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-
+                Log.d(TAG, "application onCreate");
+                PackageUtil.hookIPackManager((Context) param.thisObject);
             }
         });
-
-
-        XposedHelpers.findAndHookMethod(View.class, "setOnTouchListener", View.OnTouchListener.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object obargs = param.args[0];
-                Object pClass = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{View.OnTouchListener.class}, new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-                        Logger.d(TAG + ":  obj=" + obargs + " objectToString=" + objectToString(obargs, 5));
-                        Logger.json(objectToString(obargs, 3));
-                        return method.invoke(obargs, args);
-                    }
-                });
-                param.args[0] = pClass;
-                super.beforeHookedMethod(param);
-            }
-
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-
-            }
-        });
-        Logger.addLogAdapter(new AndroidLogAdapter());
     }
 
-    public String objectToString(Object o, int deep) {
-        if (o == null) {
-            return "\"null\"";
-        }
 
-        Class<?> aClass = o.getClass();
-        Field[] declaredFields = aClass.getDeclaredFields();
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{\"className\":").append("\""+aClass.getName()+"\"");
-        stringBuilder.append(",").append("\"hashCode\":").append("\"").append(o.hashCode()).append("\"");
-        for (Field declaredField : declaredFields) {
-            declaredField.setAccessible(true);
-            try {
-
-                stringBuilder.append(",").append("\""+declaredField.getName()+"\"").append(":");
-
-                if (declaredField.get(o) != null) {
-                    Object o1 = declaredField.get(o);
-                    Class clzz=o1.getClass();
-                    String name = clzz.getName();
-
-                    if (name.startsWith("java.lang")) {
-                        stringBuilder.append("\""+declaredField.get(o)+"\"");
-                    }else if(name.startsWith("android")||name.startsWith("java.util")||o1 instanceof View||o1 instanceof Activity||name.equals("com.xingin.capa.lib.video.entity.VideoTemplate")){
-                        stringBuilder.append("\""+name+"\"");
-                    } else {
-                        if (deep > 0) {
-                            stringBuilder.append(objectToString(declaredField.get(o), deep - 1));
-                        } else {
-                            stringBuilder.append("\""+declaredField.get(o).getClass().getName()+"\"");
-                        }
-                    }
-                } else {
-                    stringBuilder.append("\"null\"");
-                }
-
-
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return stringBuilder.append("}").toString();
-    }
 
     public boolean superClassStartWith(Class clazz,String start){
         Class zz=clazz;
