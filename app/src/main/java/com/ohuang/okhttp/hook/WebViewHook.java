@@ -3,6 +3,7 @@ package com.ohuang.okhttp.hook;
 import android.util.Log;
 import android.webkit.WebView;
 
+import com.ohuang.okhttp.LogFile;
 import com.ohuang.okhttp.Util;
 import com.ohunag.xposedutil.Hook;
 import com.ohunag.xposedutil.IHook;
@@ -16,7 +17,8 @@ public class WebViewHook extends IHook {
     public static final String TAG = "WebViewHook";
     public Set<String> javascriptInterfaces = new HashSet<>();
 
-    public WebViewHook(ClassLoader classLoader) {
+    public
+    WebViewHook(ClassLoader classLoader) {
         super(classLoader);
     }
 
@@ -54,8 +56,11 @@ public class WebViewHook extends IHook {
                     }.hook();
                 }
             }
-        }else if("evaluateJavascript".equals(param.method.getName())){
-            Util.logStackTraceElement(TAG+"-evaluateJavascript");
+        } else if ("evaluateJavascript".equals(param.method.getName())) {
+            Util.logStackTraceElement(TAG + "-evaluateJavascript");
+//            LogFile.logDate(TAG, param.args[0].toString());
+        } else if ("loadUrl".equals(param.method.getName())) {
+            LogFile.logDate(TAG, "loadUrl="+param.args[0].toString());
         }
         Member method = param.method;
         Object thisObject = param.thisObject;

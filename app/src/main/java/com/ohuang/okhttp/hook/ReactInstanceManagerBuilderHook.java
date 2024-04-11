@@ -37,7 +37,6 @@ public class ReactInstanceManagerBuilderHook extends IHook {
         Member method = param.method;
         Object thisObject = param.thisObject;
         log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" + Arrays.toString(param.args));
-
         return false;
     }
 

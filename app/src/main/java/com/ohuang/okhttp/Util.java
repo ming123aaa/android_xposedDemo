@@ -1,9 +1,12 @@
 package com.ohuang.okhttp;
 
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.CookieManager;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Util {
 
@@ -22,11 +25,19 @@ public class Util {
      */
     public static void logStackTraceElement(String tag) {
         StackTraceElement[] stackTraceElement = new Throwable().getStackTrace();
-        Log.d(tag, "logStackTraceElement: ----------------start------------");
+        Log.w(tag, "logStackTraceElement: ----------------start------------");
         for (int i = 0; i < stackTraceElement.length; i++) {
-            Log.d(tag, "logStackTraceElement: " + stackTraceElement[i].toString());
+            Log.w(tag, "logStackTraceElement: " + stackTraceElement[i].toString());
         }
-        Log.d(tag, "logStackTraceElement: ----------------end------------------");
+        Log.w(tag, "logStackTraceElement: ----------------end------------------");
+    }
+
+    public static void logStackTraceElement(String tag,StackTraceElement[] stackTraceElement) {
+        Log.w(tag, "logStackTraceElement: ----------------start------------");
+        for (int i = 0; i < stackTraceElement.length; i++) {
+            Log.w(tag, "logStackTraceElement: " + stackTraceElement[i].toString());
+        }
+        Log.w(tag, "logStackTraceElement: ----------------end------------------");
     }
 
     /**
@@ -54,7 +65,32 @@ public class Util {
     }
 
 
+    public static boolean superClassStartWith(Class clazz, String start) {
+        Class zz = clazz;
+        while (zz != null && zz != Object.class) {
+            if (zz.getName().startsWith(start)) {
+                return true;
+            }
+            zz = zz.getSuperclass();
+        }
+        return false;
+    }
 
+
+    public static String toDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+        Date date = new Date(); // 获取当前时间
+        String format = sdf.format(date);
+        return format;
+    }
+
+
+
+
+
+    public static void log(String s) {
+        LogFile.addLog(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/com.ohuang.okhttp" + "/Tutorial.log", s);
+    }
 
 
 

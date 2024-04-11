@@ -34,11 +34,9 @@ public class CookieManagerHook extends AbstractHook {
             public boolean afterMethod(MethodHookParam param) {
                 Member method = param.method;
                 Object thisObject = param.thisObject;
-                Object result=param.getResult();
-                log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" + Arrays.toString(param.args)+"  result="+result);
-                if ("getCookie".equals(method.getName())&&"https://accounts.nintendo.com/login".equals(param.args[0])){
-                    Util.logStackTraceElement(TAG);
-                }
+                Object result = param.getResult();
+                log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" + Arrays.toString(param.args) + "  result=" + result);
+//                Util.logStackTraceElement(TAG);
                 return super.afterMethod(param);
             }
         };

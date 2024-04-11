@@ -1,10 +1,13 @@
 package com.ohunag.xposedutil;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +35,7 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
     private Class<?> mClass;
     public ClassLoader mClassLoader = ClassLoader.getSystemClassLoader();
 
-    public List<Unhook> unhookList=new ArrayList<>();
+    public List<Unhook> unhookList = new ArrayList<>();
 
 
     /**
@@ -70,26 +73,29 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
 
     public abstract boolean beforeMethod(MethodHookParam param);
 
-    public  void beforeMethodEnd(MethodHookParam param){}
+    public void beforeMethodEnd(MethodHookParam param) {
+    }
 
     public abstract boolean afterMethod(MethodHookParam param);
-    public   void afterMethodEnd(MethodHookParam param){}
+
+    public void afterMethodEnd(MethodHookParam param) {
+    }
 
 
-    public void unHook(){
+    public void unHook() {
         for (int i = 0; i < unhookList.size(); i++) {
-            if (unhookList.get(i)!=null){
+            if (unhookList.get(i) != null) {
                 unhookList.get(i).unhook();
             }
         }
         unhookList.clear();
     }
 
-    public void hookAllMethodForSuper(){
+    protected void hookAllMethodForSuper() {
         hookAllMethodForSuper(this);
     }
 
-    public void hookAllMethodForSuper(XC_MethodHook xc_methodHook) {
+    protected void hookAllMethodForSuper(XC_MethodHook xc_methodHook) {
         Class<?> aClass = toClass();
         while (aClass != null) {
             Method[] methods = aClass.getDeclaredMethods();
@@ -112,11 +118,13 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
             aClass = aClass.getSuperclass();
         }
     }
-    public void hookAllMethod(){
+
+    protected void hookAllMethod() {
         hookAllMethod(this);
     }
-    public void hookAllMethod(XC_MethodHook xc_methodHook) {
-        if (toClass()==null){
+
+    protected void hookAllMethod(XC_MethodHook xc_methodHook) {
+        if (toClass() == null) {
             return;
         }
         Method[] methods = toClass().getDeclaredMethods();
@@ -140,31 +148,34 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
 
         }
     }
-    public void hookAllMethodForBridge(String name){
-        hookAllMethodForBridge(name,this);
+
+    protected void hookAllMethodForBridge(String name) {
+        hookAllMethodForBridge(name, this);
     }
 
-    public void hookAllMethodForBridge(String name,XC_MethodHook xc_methodHook){
-        if (toClass()==null){
+    protected void hookAllMethodForBridge(String name, XC_MethodHook xc_methodHook) {
+        if (toClass() == null) {
             return;
         }
         Set<Unhook> unhooks = XposedBridge.hookAllMethods(toClass(), name, xc_methodHook);
         unhookList.addAll(unhooks);
     }
 
-    public void hookAllConstructorsForBridge(){
+    protected void hookAllConstructorsForBridge() {
         hookAllConstructorsForBridge(this);
     }
-    public void hookAllConstructorsForBridge(XC_MethodHook xc_methodHook){
+
+    protected void hookAllConstructorsForBridge(XC_MethodHook xc_methodHook) {
         Set<Unhook> unhooks = XposedBridge.hookAllConstructors(toClass(), xc_methodHook);
         unhookList.addAll(unhooks);
     }
 
-    public void hookAllMethodForSuper(String name){
-        hookAllMethodForSuper(name,this);
+    protected void hookAllMethodForSuper(String name) {
+        hookAllMethodForSuper(name, this);
 
     }
-    public void hookAllMethodForSuper(String name,XC_MethodHook xc_methodHook) {
+
+    protected void hookAllMethodForSuper(String name, XC_MethodHook xc_methodHook) {
         Class<?> aClass = toClass();
         while (aClass != null) {
             Method[] methods = aClass.getDeclaredMethods();
@@ -190,11 +201,13 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
             aClass = aClass.getSuperclass();
         }
     }
-    public void hookAllMethod(String name) {
-        hookAllMethod(name,this);
+
+    protected void hookAllMethod(String name) {
+        hookAllMethod(name, this);
     }
-    public void hookAllMethod(String name,XC_MethodHook xc_methodHook) {
-        if (toClass()==null){
+
+    protected void hookAllMethod(String name, XC_MethodHook xc_methodHook) {
+        if (toClass() == null) {
             return;
         }
         Method[] methods = toClass().getDeclaredMethods();
@@ -216,17 +229,20 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
             }
         }
     }
+
     @Deprecated
-    public void hookMethodForSuper(String name, Class<?>... parameterTypes){
-        hookMethodForSuper(name,this,parameterTypes);
+    protected void hookMethodForSuper(String name, Class<?>... parameterTypes) {
+        hookMethodForSuper(name, this, parameterTypes);
     }
+
     /**
      * hook方法包括父类的
+     *
      * @param name
      * @param parameterTypes
      */
     @Deprecated
-    public void hookMethodForSuper(String name,XC_MethodHook xc_methodHook, Class<?>... parameterTypes) {
+    protected void hookMethodForSuper(String name, XC_MethodHook xc_methodHook, Class<?>... parameterTypes) {
         Class<?> aClass = toClass();
         while (aClass != null) {
             Method[] methods = aClass.getDeclaredMethods();
@@ -258,11 +274,12 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
         }
     }
 
-    public void hookMethod(String name,Class<?>... parameterTypes){
-        hookMethod(name,this,parameterTypes);
+    protected void hookMethod(String name, Class<?>... parameterTypes) {
+        hookMethod(name, this, parameterTypes);
     }
-    public void hookMethod(String name, XC_MethodHook xc_methodHook,Class<?>... parameterTypes) {
-        if (toClass()==null){
+
+    protected void hookMethod(String name, XC_MethodHook xc_methodHook, Class<?>... parameterTypes) {
+        if (toClass() == null) {
             return;
         }
         Object[] objects = new Object[parameterTypes.length + 1];
@@ -279,11 +296,12 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
     }
 
 
-    public void hookAllConstructor(){
+    protected void hookAllConstructor() {
         hookAllConstructor(this);
     }
-    public void hookAllConstructor(XC_MethodHook xc_methodHook) {
-        if (toClass()==null){
+
+    protected void hookAllConstructor(XC_MethodHook xc_methodHook) {
+        if (toClass() == null) {
             return;
         }
         Constructor[] methods = toClass().getConstructors();
@@ -304,11 +322,13 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
             }
         }
     }
-    public void hookConstructor(Class<?>... parameterTypes){
-        hookConstructor(this,parameterTypes);
+
+    protected void hookConstructor(Class<?>... parameterTypes) {
+        hookConstructor(this, parameterTypes);
     }
-    public void hookConstructor(XC_MethodHook xc_methodHook,Class<?>... parameterTypes) {
-        if (toClass()==null){
+
+    protected void hookConstructor(XC_MethodHook xc_methodHook, Class<?>... parameterTypes) {
+        if (toClass() == null) {
             return;
         }
         Object[] objects = new Object[parameterTypes.length + 1];
@@ -326,17 +346,53 @@ public abstract class IHook extends XC_MethodHook implements HookCallBack {
 
     @Override
     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-        if (!beforeMethod(param)) {
-            super.beforeHookedMethod(param);
+        try {
+            if (!beforeMethod(param)) {
+                super.beforeHookedMethod(param);
+            }
+            beforeMethodEnd(param);
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        beforeMethodEnd(param);
+
     }
 
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-        if (!afterMethod(param)) {
-            super.afterHookedMethod(param);
+        try {
+            if (!afterMethod(param)) {
+                super.afterHookedMethod(param);
+            }
+            afterMethodEnd(param);
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        afterMethodEnd(param);
+    }
+
+    protected void beforeLog(MethodHookParam param) {
+        Member method = param.method;
+        Object thisObject = param.thisObject;
+        String p ="" ;
+        try {
+            p= Arrays.toString(param.args);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        log("beforeMethod: thisObject=" + thisObject + "  method=" + method + " param=" +p);
+    }
+    protected void afterLog(MethodHookParam param) {
+        Member method = param.method;
+        Object thisObject = param.thisObject;
+        String p ="" ;
+        try {
+            p=Arrays.toString(param.args);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        log("afterMethod: thisObject=" + thisObject + "  method=" + method + " param=" +p);
+    }
+
+    protected void log(String text) {
+        Log.d(getClassName()+"Hook", text);
     }
 }

@@ -19,11 +19,17 @@ public class LogFile {
     }
 
     public static void logDate(String s){
-
         log(toDate()+" / "+s);
     }
     public static void log(String s) {
         LogFile.addLog(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/com.ohuang.okhttp" + "/logFile.log", s);
+    }
+
+    public static void log(String fileName,String s){
+        LogFile.addLog(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/com.ohuang.okhttp" + "/"+fileName+".log", s);
+    }
+    public static void logDate(String fileName,String s){
+        log(fileName,toDate()+" / "+s);
     }
 
     public static void addLog(String path,String data){
