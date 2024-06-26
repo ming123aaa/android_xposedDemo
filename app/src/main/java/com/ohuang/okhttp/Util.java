@@ -13,7 +13,7 @@ public class Util {
     public static void tryCatch(Block block) {
         try {
             block.invoke();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
 
@@ -21,6 +21,7 @@ public class Util {
 
     /**
      * 打印堆栈信息
+     *
      * @param tag
      */
     public static void logStackTraceElement(String tag) {
@@ -32,7 +33,18 @@ public class Util {
         Log.w(tag, "logStackTraceElement: ----------------end------------------");
     }
 
-    public static void logStackTraceElement(String tag,StackTraceElement[] stackTraceElement) {
+    public static String getLogStackTraceElement(String tag) {
+        StackTraceElement[] stackTraceElement = new Throwable().getStackTrace();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n").append(tag).append(":").append("logStackTraceElement: ----------------start------------");
+        for (int i = 0; i < stackTraceElement.length; i++) {
+            stringBuilder.append("\n").append(tag).append(":").append("logStackTraceElement: ").append(stackTraceElement[i].toString());
+        }
+        stringBuilder.append("\n").append(tag).append(":").append("logStackTraceElement: ----------------end------------------");
+        return stringBuilder.toString();
+    }
+
+    public static void logStackTraceElement(String tag, StackTraceElement[] stackTraceElement) {
         Log.w(tag, "logStackTraceElement: ----------------start------------");
         for (int i = 0; i < stackTraceElement.length; i++) {
             Log.w(tag, "logStackTraceElement: " + stackTraceElement[i].toString());
@@ -42,16 +54,17 @@ public class Util {
 
     /**
      * toString  反射获取所有参数
+     *
      * @param o
      * @return
      */
-    public static String objectToString(Object o){
-        if (o==null){
+    public static String objectToString(Object o) {
+        if (o == null) {
             return "";
         }
         Class<?> aClass = o.getClass();
         Field[] declaredFields = aClass.getDeclaredFields();
-        StringBuilder stringBuilder=new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(aClass.getName()).append(":[");
         for (Field declaredField : declaredFields) {
             declaredField.setAccessible(true);
@@ -85,13 +98,12 @@ public class Util {
     }
 
 
-
-
-
     public static void log(String s) {
         LogFile.addLog(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/com.ohuang.okhttp" + "/Tutorial.log", s);
     }
-
+    public static void log(String s,String fileName) {
+        LogFile.addLog(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/com.ohuang.okhttp" + "/"+fileName, s);
+    }
 
 
 }

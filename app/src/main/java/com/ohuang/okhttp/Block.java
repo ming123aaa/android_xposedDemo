@@ -2,5 +2,5 @@ package com.ohuang.okhttp;
 
 public interface Block {
 
-    void invoke();
+    void invoke() throws Throwable;
 }
